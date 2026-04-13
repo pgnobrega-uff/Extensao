@@ -5,7 +5,7 @@
 
 # Para realizar as tarefas da ETAPA 1, ABRIR ANTES uma branch de nome SINASC no main de Extensao e ir para ela
 # Após os alunos concluírem a ETAPA 1 a professora orientará fazer o merge into main e depois abrir outro branch. Aguarde...
-
+library(dplyr)
 
 ####################################
 # ETAPA 1: BANCO DE DADOS DO SINASC
@@ -44,15 +44,32 @@ dados_sinasc_2 = dados_sinasc_1[startsWith(dados_sinasc_1$CODMUNRES, "43"),]
 dados_sinasc_2 |> write.csv2("dados_sinasc_2.csv",row.names = FALSE)
 rm(dados_sinasc)
 rm(dados_sinasc_1)
+gc()
 # Tarefa 4. Verificar em dados_sinasc_2 a frequência das categorias das seguintes variáveis: LOCNASC, ESTCIVMAE, GESTACAO, GRAVIDEZ, PARTO,
 # SEXO, APGAR5, RACACOR, IDANOMAL, ESCMAE2010, RACACORMAE, TPAPRESENT, TPROBSON, PARIDADE, KOTELCHUCK
-
-
+table(dados_sinasc_2$LOCNASC)
+table(dados_sinasc_2$ESTCIVMAE)
+table(dados_sinasc_2$GESTACAO)
+table(dados_sinasc_2$GRAVIDEZ)
+table(dados_sinasc_2$PARTO)
+table(dados_sinasc_2$SEXO)
+table(dados_sinasc_2$APGAR5)
+table(dados_sinasc_2$RACACOR)
+table(dados_sinasc_2$IDANOMAL)
+table(dados_sinasc_2$ESCMAE2010)
+table(dados_sinasc_2$RACACORMAE)
+table(dados_sinasc_2$TPAPRESENT)
+table(dados_sinasc_2$TPROBSON)
+table(dados_sinasc_2$PARIDADE)
+table(dados_sinasc_2$KOTELCHUCK)
 # Tarefa 5. Atribuir para cada variável de dados_sinasc_2 como sendo NA a categoria de "Não informado ou Ignorado", geralmente com código 9
 # KOTELCHUCK = 9 significa "não informado"   TPROBSON = 11 significa "não classificado por falta de informação"
 # veja o dicionário do SINASC para identificar qual o código das categorias de cada variável
-
-
+dados_sinasc_2 = dados_sinasc_2 |> mutate(ESTCIVMAE = na_if(ESTCIVMAE, 9)) |>
+  mutate(SEXO = na_if(SEXO, 0)) |> mutate(APGAR5 = na_if(APGAR5, 99)) |>
+  mutate(IDANOMAL = na_if(IDANOMAL, 9)) |> mutate(ESCMAE2010 = na_if(ESCMAE2010, 9)) |>
+  mutate(TPAPRESENT = na_if(TPAPRESENT, 9)) |> mutate(TPROBSON = na_if(TPROBSON, 11)) |>
+  mutate(KOTELCHUCK = na_if(KOTELCHUCK, 9))
 # Tarefa 6. Atribuir legendas para as categorias das variáveis investigadas na etapa 4.
 # Exemplo: dados_sinasc_2$KOTELCHUCK = factor(dados_sinasc_2$KOTELCHUCK, levels = c(1,2,3,4,5), 
 # labels = c("Não realizou pré-natal", "Inadequado", "Intermediário", "Adequado",  
