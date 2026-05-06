@@ -5,7 +5,7 @@
 
 # Para realizar as tarefas da ETAPA 1, ABRIR ANTES uma branch de nome SINASC no main de Extensao e ir para ela
 # Após os alunos concluírem a ETAPA 1 a professora orientará fazer o merge into main e depois abrir outro branch. Aguarde...
-library(dplyr)
+library(tidyverse)
 
 ####################################
 # ETAPA 1: BANCO DE DADOS DO SINASC
@@ -89,7 +89,7 @@ dados_sinasc_2$GESTACAO = factor(dados_sinasc_2$GESTACAO,
                                   labels = c("Menos de 22 semanas", "22 a 27 semanas", "28 a 31 semanas", "32 a 36 semanas", "37 a 41 semanas", "42 semanas e mais"))
 dados_sinasc_2$GRAVIDEZ = factor(dados_sinasc_2$GRAVIDEZ, 
                                    levels = c(1,2,3),
-                                   labels = c("Unica", "Dupla", "Tripla ou mais"))
+                                   labels = c("Única", "Dupla", "Tripla ou mais"))
 dados_sinasc_2$PARTO = factor(dados_sinasc_2$PARTO, 
                                   levels = c(1,2),
                                   labels = c("Vaginal", "Cesario"))
@@ -220,31 +220,215 @@ names(dp_idade)[2] = "IM_DP"
 temp = merge(media_idade, dp_idade, by = "CODMUNRES")
 base = merge(base, temp, by = "CODMUNRES", all.x = TRUE)
 
+#Escolaridade
+escolaridade = dados_sinasc_2 |> group_by(CODMUNRES, ESCMAE2010) |> count() |> 
+  pivot_wider(names_from = ESCMAE2010, values_from =  n) |> as.data.frame()
+escolaridade[is.na(escolaridade)] = 0
+escolaridade = escolaridade[,-ncol(escolaridade)]
+names(escolaridade) = c("CODMUNRES","EM_S","EM_FI","EM_FII","EM_M","EM_SI","EM_SC")
+base = merge(base, escolaridade, by = "CODMUNRES", all.x = TRUE)
 
-# Frequências de variáveis categóricas
-# Exemplos:
-#Sexo
-tab = table(dados_sinasc_2$CODMUNRES, factor(dados_sinasc_2$SEXO, levels = c("Feminino",
-                                                                             "Masculino")))
-df = as.data.frame.matrix(tab)
-names(df) = c("TRSEXO_F","TRSEXO_M")
-df$CODMUNRES = rownames(df)
+#Raça/cor mae
+raca = dados_sinasc_2 |> group_by(CODMUNRES, RACACORMAE) |> count() |> 
+  pivot_wider(names_from = RACACORMAE, values_from =  n) |> as.data.frame()
+raca[is.na(raca)] = 0
+raca = raca[,-ncol(raca)]
+names(raca) = c("CODMUNRES","TGRC_B","TGRC_PT","TGRC_PD","TGRC_I","TGRC_A")
+base = merge(base, raca, by = "CODMUNRES", all.x = TRUE)
 
-base = merge(base, df, by = "CODMUNRES", all.x = TRUE)
+#Companheiro
+companheiro = dados_sinasc_2
+companheiro$ESTCIVMAE = ifelse(companheiro$ESTCIVMAE == "Casada" | companheiro$ESTCIVMAE == "Uniao estavel", 
+                               "TGCC", "TGSC")
+companheiro = companheiro |> group_by(CODMUNRES, ESTCIVMAE) |> count() |>
+  pivot_wider(names_from = ESTCIVMAE, values_from =  n) |> as.data.frame()
+companheiro[is.na(companheiro)] = 0
+companheiro = companheiro[,-ncol(companheiro)]
+base = merge(base, companheiro, by = "CODMUNRES", all.x = TRUE)
 
-# Tipo de Parto
-tab = table( dados_sinasc_2$CODMUNRES, factor(dados_sinasc_2$PARTO, levels = c("Vaginal",
-                                                                               "Cesário")))
-df = as.data.frame.matrix(tab)
-names(df) = c("TPV","TPC")
-df$CODMUNRES = rownames(df)
-base = merge(base, df, by = "CODMUNRES", all.x = TRUE)
+#Primeiro filho
+paridade = dados_sinasc_2 |> group_by(CODMUNRES, PARIDADE) |> count() |> 
+  pivot_wider(names_from = PARIDADE, values_from =  n) |> as.data.frame()
+paridade[is.na(paridade)] = 0
+names(paridade) = c("CODMUNRES","TGNPRI","TGPRI")
+base = merge(base, paridade, by = "CODMUNRES", all.x = TRUE)
+
+#Gemeos
+gemeos = dados_sinasc_2
+gemeos$GRAVIDEZ = ifelse(gemeos$GRAVIDEZ == "Unica", "TGU", "TGG")
+gemeos = gemeos |> group_by(CODMUNRES, GRAVIDEZ) |> count() |>
+  pivot_wider(names_from = GRAVIDEZ, values_from =  n) |> as.data.frame()
+gemeos[is.na(gemeos)] = 0
+base = merge(base, gemeos, by = "CODMUNRES", all.x = TRUE)
+
+#tempo gestacao
+tempo = dados_sinasc_2 |> group_by(CODMUNRES, GESTACAO) |> count() |> 
+  pivot_wider(names_from = GESTACAO, values_from =  n) |> as.data.frame()
+tempo[is.na(tempo)] = 0
+tempo = tempo[,-7]
+names(tempo) = c("CODMUNRES","TGD_32_36","TGD_37_41", "TGD_42","TGD_28_31","TGD_22_27","TGD_22")
+base = merge(base, tempo, by = "CODMUNRES", all.x = TRUE)
+
+#pre termo
+pre_termo = dados_sinasc_2
+pre_termo$GESTACAO = ifelse(pre_termo$GESTACAO == "Menos de 22 semanas" | 
+                              pre_termo$GESTACAO == "22 a 27 semanas" |
+                              pre_termo$GESTACAO == "28 a 31 semanas" |
+                              pre_termo$GESTACAO == "32 a 36 semanas", 
+                               "TGD_PRT", ifelse(pre_termo$GESTACAO == "37 a 41 semanas", "TGD_AT", "TGD_PST"))
+pre_termo = pre_termo |> group_by(CODMUNRES, GESTACAO) |> count() |>
+  pivot_wider(names_from = GESTACAO, values_from =  n) |> as.data.frame()
+pre_termo[is.na(pre_termo)] = 0
+pre_termo = pre_termo[,-ncol(pre_termo)]
+base = merge(base, pre_termo, by = "CODMUNRES", all.x = TRUE)
+#percentils duracao
+p_gestacao = aggregate( SEMAGESTAC ~ CODMUNRES, dados_sinasc_2, function(x) quantile(x, probs =
+                                                                                  c(0.25,0.5,0.75), na.rm = TRUE))
+p_gestacao = do.call(data.frame, p_gestacao)
+names(p_gestacao) = c("CODMUNRES","DG_P25","DG_P50", "DG_P75")
+p_gestacao[, c("DG_P25","DG_P50","DG_P75")] = round(p_gestacao[, c("DG_P25","DG_P50","DG_P75")], 2)
+base = merge(base, p_gestacao, by="CODMUNRES", all.x=TRUE)
+
+#media e desvio gestante
+media_gestacao = aggregate(SEMAGESTAC ~ CODMUNRES, dados_sinasc_2, mean, na.rm = TRUE)
+media_gestacao$SEMAGESTAC = round(media_gestacao$SEMAGESTAC, 2)
+names(media_gestacao)[2] = "DG_MD"
+dp_gestacao = aggregate(SEMAGESTAC ~ CODMUNRES, dados_sinasc_2, sd, na.rm = TRUE)
+dp_gestacao$SEMAGESTAC = round(dp_gestacao$SEMAGESTAC, 2)
+names(dp_gestacao)[2] = "DG_DP"
+temp = merge(media_idade, dp_gestacao, by = "CODMUNRES")
+base = merge(base, temp, by = "CODMUNRES", all.x = TRUE)
+
+#pre-natal
+pre_natal = dados_sinasc_2 |> group_by(CODMUNRES, KOTELCHUCK) |> count() |> 
+  pivot_wider(names_from = KOTELCHUCK, values_from =  n) |> as.data.frame()
+pre_natal[is.na(pre_natal)] = 0
+pre_natal = pre_natal[,-5]
+names(pre_natal) = c("CODMUNRES","TKC_ID","TKC_AD","TKC_MAD","TKC_IT","TGRC_NR")
+base = merge(base, pre_natal, by = "CODMUNRES", all.x = TRUE)
+
+#peregrinacao
+peregrinacao = dados_sinasc_2
+peregrinacao$PEREGRINACAO = ifelse(peregrinacao$CODMUNRES != peregrinacao$CODMUNNASC, 
+                               "TGPRG_S", "TGPRG_N")
+peregrinacao = peregrinacao |> group_by(CODMUNRES, PEREGRINACAO) |> count() |>
+  pivot_wider(names_from = PEREGRINACAO, values_from =  n) |> as.data.frame()
+peregrinacao[is.na(peregrinacao)] = 0
+base = merge(base, peregrinacao, by = "CODMUNRES", all.x = TRUE)
+
+#tipo_parto
+tipo_parto = dados_sinasc_2 |> group_by(CODMUNRES, PARTO) |> count() |> 
+  pivot_wider(names_from = PARTO, values_from =  n) |> as.data.frame()
+tipo_parto[is.na(tipo_parto)] = 0
+tipo_parto = tipo_parto[,-ncol(tipo_parto)]
+names(tipo_parto) = c("CODMUNRES","TPV","TPC")
+base = merge(base, tipo_parto, by = "CODMUNRES", all.x = TRUE)
+
+#TPAPRESENT
+tpapresent = dados_sinasc_2 |> group_by(CODMUNRES, TPAPRESENT) |> count() |> 
+  pivot_wider(names_from = TPAPRESENT, values_from =  n) |> as.data.frame()
+tpapresent[is.na(tpapresent)] = 0
+tpapresent = tpapresent[,-4]
+names(tpapresent) = c("CODMUNRES","TRAP_C","TRAP_P", "TRAP_T")
+base = merge(base, tpapresent, by = "CODMUNRES", all.x = TRUE)
+
+#TPROBSON
+tprobson = dados_sinasc_2 |> group_by(CODMUNRES, TPROBSON) |> count() |> 
+  pivot_wider(names_from = TPROBSON, values_from =  n) |> as.data.frame()
+tprobson[is.na(tprobson)] = 0
+tprobson = tprobson[,-11]
+names(tprobson) = c("CODMUNRES","TGROB_1","TGROB_2","TGROB_3","TGROB_4","TGROB_5",
+                    "TGROB_6","TGROB_7","TGROB_8","TGROB_10","TGROB_9")
+base = merge(base, tprobson, by = "CODMUNRES", all.x = TRUE)
+
+#nasc
+nasc = dados_sinasc_2 |> group_by(CODMUNRES, LOCNASC) |> count() |> 
+  pivot_wider(names_from = LOCNASC, values_from =  n) |> as.data.frame()
+nasc[is.na(nasc)] = 0
+names(nasc) = c("CODMUNRES","TNLOC_H","TNLOC_O","TNLOC_ES","TNLOC_D")
+nasc$TNLOC_AI = 0
+base = merge(base, nasc, by = "CODMUNRES", all.x = TRUE)
+
+#sexo
+sexo = dados_sinasc_2 |> group_by(CODMUNRES, SEXO) |> count() |> 
+  pivot_wider(names_from = SEXO, values_from =  n) |> as.data.frame()
+sexo[is.na(sexo)] = 0
+sexo = sexo[,-ncol(sexo)]
+names(sexo) = c("CODMUNRES","TRS_M","TRS_F")
+base = merge(base, sexo, by = "CODMUNRES", all.x = TRUE)
+
+#raca/cor
+raca = dados_sinasc_2 |> group_by(CODMUNRES, RACACOR) |> count() |> 
+  pivot_wider(names_from = RACACOR, values_from =  n) |> as.data.frame()
+raca[is.na(raca)] = 0
+raca = raca[,-ncol(raca)]
+names(raca) = c("CODMUNRES","TRRC_B","TRRC_PT","TRRC_PD","TRRC_I","TRRC_A")
+base = merge(base, raca, by = "CODMUNRES", all.x = TRUE)
+
+#peso
+peso = dados_sinasc_2 |> group_by(CODMUNRES, F_PESO) |> count() |> 
+  pivot_wider(names_from = F_PESO, values_from =  n) |> as.data.frame()
+peso[is.na(peso)] = 0
+peso = peso[,-ncol(peso)]
+names(peso) = c("CODMUNRES","TRP_BP","TRP_N","TRP_M")
+base = merge(base, peso, by = "CODMUNRES", all.x = TRUE)
+
+#percentil peso
+p_peso = aggregate( PESO ~ CODMUNRES, dados_sinasc_2, function(x) quantile(x, probs =
+                                                                                       c(0.25,0.5,0.75), na.rm = TRUE))
+p_peso = do.call(data.frame, p_peso)
+names(p_peso) = c("CODMUNRES","PESO_P25","PESO_P50", "PESO_P75")
+p_peso[, c("PESO_P25","PESO_P50","PESO_P75")] = round(p_peso[, c("PESO_P25","PESO_P50","PESO_P75")], 2)
+base = merge(base, p_peso, by="CODMUNRES", all.x=TRUE)
+
+#media e desvio padrao peso
+media_peso = aggregate(PESO ~ CODMUNRES, dados_sinasc_2, mean, na.rm = TRUE)
+media_peso$PESO = round(media_peso$PESO, 2)
+names(media_idade)[2] = "PESO_MD"
+dp_peso = aggregate(PESO ~ CODMUNRES, dados_sinasc_2, sd, na.rm = TRUE)
+dp_peso$PESO = round(dp_peso$PESO, 2)
+names(dp_peso)[2] = "PESO_DP"
+temp = merge(media_peso, dp_peso, by = "CODMUNRES")
+base = merge(base, temp, by = "CODMUNRES", all.x = TRUE)
+
+#f_pig
+f_pig = dados_sinasc_2 |> group_by(CODMUNRES, F_PIG) |> count() |> 
+  pivot_wider(names_from = F_PIG, values_from =  n) |> as.data.frame()
+f_pig[is.na(f_pig)] = 0
+f_pig = f_pig[,-ncol(f_pig)]
+names(f_pig) = c("CODMUNRES","TRPIG_P","TRPIG_A","TRPIG_G")
+base = merge(base, f_pig, by = "CODMUNRES", all.x = TRUE)
+
+#apgar 5
+f_apgar5 = dados_sinasc_2 |> group_by(CODMUNRES, F_APGAR5) |> count() |> 
+  pivot_wider(names_from = F_APGAR5, values_from =  n) |> as.data.frame()
+f_apgar5[is.na(f_apgar5)] = 0
+f_apgar5 = f_apgar5[,-ncol(f_apgar5)]
+names(f_apgar5) = c("CODMUNRES","TRAPG5_B","TRAPG5_N")
+base = merge(base, f_apgar5, by = "CODMUNRES", all.x = TRUE)
+
+#media e desvio padrao apgar 5
+media_apgar5 = aggregate(APGAR5 ~ CODMUNRES, dados_sinasc_2, mean, na.rm = TRUE)
+media_apgar5$APGAR5 = round(media_apgar5$APGAR5, 2)
+names(media_apgar5)[2] = "APGAR5_MD"
+dp_apgar5 = aggregate(APGAR5 ~ CODMUNRES, dados_sinasc_2, sd, na.rm = TRUE)
+dp_apgar5$APGAR5 = round(dp_apgar5$APGAR5, 2)
+names(dp_apgar5)[2] = "APGAR5_DP"
+temp = merge(media_apgar5, dp_apgar5, by = "CODMUNRES")
+base = merge(base, temp, by = "CODMUNRES", all.x = TRUE)
+
+#anomalia
+anomalia = dados_sinasc_2 |> group_by(CODMUNRES, IDANOMAL) |> count() |> 
+  pivot_wider(names_from = IDANOMAL, values_from =  n) |> as.data.frame()
+anomalia[is.na(anomalia)] = 0
+anomalia = anomalia[,-ncol(anomalia)]
+names(anomalia) = c("CODMUNRES","TRSAC","TRAC")
+base = merge(base, anomalia, by = "CODMUNRES", all.x = TRUE)
 
 
-
-
-
-
+x = colSums(base[,4:ncol(base)])
+y = c(NA,2015,"ESTADO",x)
+base = rbind(base, y)
 # Tarefa 11: Exporte o banco de dados com o nome SINASC_UF.csv
 write.csv2(base, file = "SINASC_UF.csv")
 
