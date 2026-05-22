@@ -646,9 +646,45 @@ neo_natais[is.na(neo_natais)] = 0
 names(neo_natais) = c("CODMUNRES", "TONT_B","TONT_PT","TONT_PD","TONT_I","TONT_A")
 base = merge(base, neo_natais, by = "CODMUNRES", all.x = TRUE)
 
+#inf maternas
+total = dados_sim_2 |> filter(!is.na(MORTEPARTO)) |>group_by(CODMUNRES) |> count()
+names(total) = c("CODMUNRES","TO_MT")
+base = merge(base, total, by = "CODMUNRES", all.x = TRUE)
 
+morteParto = dados_sim_2 |> filter(!is.na(TPMORTEOCO)) |> 
+  group_by(CODMUNRES, TPMORTEOCO) |> count()|> pivot_wider(names_from = TPMORTEOCO, 
+                                                 values_from = n)
+morteParto[is.na(morteParto)] = 0
+names(morteParto) = c("CODMUNRES","TO_MT_DG","TO_MT_43","TO_MT_PT","TO_MT_42","TO_MT_AB")
+base = merge(base, morteParto, by = "CODMUNRES", all.x = TRUE)
+
+precoce = dados_sim_2 |> filter (TPMORTEOCO %in% c("Na gravidez", "No parto",
+                                                   "No abortamento",
+                                                   "Até 42 dias após o término do parto"))
+total = precoce |> group_by(CODMUNRES) |> count()
+names(total) = c("CODMUNRES","TO_MT_P")
+base = merge(base, total, by = "CODMUNRES", all.x = TRUE)
+
+fertil = precoce |> filter(IDADE >= 415 & IDADE <= 445) |> group_by(CODMUNRES) |>
+  count()
+names(fertil) = c("CODMUNRES","TO_MT_P_I")
+base = merge(base, fertil, by = "CODMUNRES", all.x = TRUE)
+
+escolaridade = precoce |> filter(!is.na(ESC2010) & ESC2010 != 9)|> 
+  group_by(CODMUNRES, ESC2010) |> count() |>
+  pivot_wider(names_from = ESC2010, values_from = n)
+
+names(escolaridade) = c("CODMUNRES","TO_MT_P_EM","TO_MT_P_EFI",
+                        "TO_MT_P_EFII","TO_MT_P_ESC","TO_MT_P_ESI")
+escolaridade["TO_MT_P_ES"] = 0
+base = merge(base, escolaridade, by = "CODMUNRES", all.x = TRUE)
+
+base[is.na(base)] = 0
+x = colSums(base[,4:ncol(base)])
+y = c(NA,2015,"ESTADO",x)
+base = rbind(base, y)
 # Tarefa 8: Exporte o banco de dados com o nome SIM_UF.csv
-
+write.csv2(base, "SIM_UF.csv")
 
 ####################################################
 # ETAPA 3: OUTROS BANCOS DE DADOS: IBGE, SNIS, ...
