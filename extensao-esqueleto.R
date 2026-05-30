@@ -835,7 +835,7 @@ sidra$CODMUNRES = sidra$CODMUNRES |> substr(1,6)
 base = merge(sidra,atlas, by="CODMUNRES")
 base = merge(base, sinasc, by = "CODMUNRES")
 base = merge(base, sim, by = "CODMUNRES")
-base = merge(base, sinasa, by = "CODMUNRES")
+base = merge(base, sinisa, by = "CODMUNRES")
 write.csv2(base, "DA_RS.csv")
 # Tarefa 2: Acrescentar no banco DA_UF os indicadores TFG, TMG, RMM, TMM, TMM_P, TMN, TMN_P, TMN_T e TMI e chamar o banco de BDEM_UF_2015
 
