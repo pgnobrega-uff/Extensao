@@ -753,10 +753,23 @@ write.csv2(base, "SIDRA.csv")
 # 3  CODMUNRES
 # 4 POPR_RA
 # 5 POPR_RE
+esgoto = read.csv2("agua e esgoto - município - 2015.csv")
+esgoto = esgoto |> filter(Estado == "RS")
+esgoto[is.na(esgoto)] = 0
+base = data.frame(CODMUNRES =sort(unique(esgoto$CODMUNRES)))
+base$ANO = 2015
+base$NIVEL = "MUNICIPIO"
+base = base[,c(2,3,1)]
+base["POPR_RA"] = as.numeric(esgoto$POPR_RA)
+base["POPR_RE"] = as.numeric(esgoto$POPR_RE)
 
+x = colSums(base[,4:ncol(base)])
+y = c(NA,2015,"ESTADO",x)
+base = rbind(base, y)
+base[is.na(base)] = 0
 # Exporte o arquivo em formato CSV
 # Faça o commit com a mensagem "Script e dados TAREFA 3 - SINISA"
-
+write.csv2(base, "Sinisa.csv")
 
 # Tarefa 3: Acesso aos bancos de dados do ATLAS  e obtenção da informação
 # Escreva os comandos da Tarefa 3 estando na branch OUTROS
