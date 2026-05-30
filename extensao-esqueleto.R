@@ -751,6 +751,10 @@ write.csv2(base, "SIM_UF.csv")
 # Exporte o arquivo em formato CSV# Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
 
 
+# Exporte o arquivo em formato CSV
+# Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
+
+
 
 
 #####################################################################################################
