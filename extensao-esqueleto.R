@@ -82,29 +82,29 @@ dados_sinasc_2$LOCNASC = factor(dados_sinasc_2$LOCNASC,
                                 levels = c(1,2,3,4),
                                 labels = c("Hospital", "Outros estabelecimentos de saude", "Domicilio", "Outros"))
 dados_sinasc_2$ESTCIVMAE = factor(dados_sinasc_2$ESTCIVMAE, 
-                                levels = c(1,2,3,4,5),
-                                labels = c("Solteira", "Casada", "Viuva", "Divorciada", "Uniao estavel"))
-dados_sinasc_2$GESTACAO = factor(dados_sinasc_2$GESTACAO, 
-                                  levels = c(1,2,3,4,5,6),
-                                  labels = c("Menos de 22 semanas", "22 a 27 semanas", "28 a 31 semanas", "32 a 36 semanas", "37 a 41 semanas", "42 semanas e mais"))
-dados_sinasc_2$GRAVIDEZ = factor(dados_sinasc_2$GRAVIDEZ, 
-                                   levels = c(1,2,3),
-                                   labels = c("Única", "Dupla", "Tripla ou mais"))
-dados_sinasc_2$PARTO = factor(dados_sinasc_2$PARTO, 
-                                  levels = c(1,2),
-                                  labels = c("Vaginal", "Cesario"))
-dados_sinasc_2$SEXO = factor(dados_sinasc_2$SEXO, 
-                                  levels = c(1,2),
-                                  labels = c("Masculino", "Feminino"))
-dados_sinasc_2$RACACOR = factor(dados_sinasc_2$RACACOR, 
                                   levels = c(1,2,3,4,5),
-                                  labels = c("Branca", "Preta", "Amarela", "Parda", "Indigena"))
+                                  labels = c("Solteira", "Casada", "Viuva", "Divorciada", "Uniao estavel"))
+dados_sinasc_2$GESTACAO = factor(dados_sinasc_2$GESTACAO, 
+                                 levels = c(1,2,3,4,5,6),
+                                 labels = c("Menos de 22 semanas", "22 a 27 semanas", "28 a 31 semanas", "32 a 36 semanas", "37 a 41 semanas", "42 semanas e mais"))
+dados_sinasc_2$GRAVIDEZ = factor(dados_sinasc_2$GRAVIDEZ, 
+                                 levels = c(1,2,3),
+                                 labels = c("Única", "Dupla", "Tripla ou mais"))
+dados_sinasc_2$PARTO = factor(dados_sinasc_2$PARTO, 
+                              levels = c(1,2),
+                              labels = c("Vaginal", "Cesario"))
+dados_sinasc_2$SEXO = factor(dados_sinasc_2$SEXO, 
+                             levels = c(1,2),
+                             labels = c("Masculino", "Feminino"))
+dados_sinasc_2$RACACOR = factor(dados_sinasc_2$RACACOR, 
+                                levels = c(1,2,3,4,5),
+                                labels = c("Branca", "Preta", "Amarela", "Parda", "Indigena"))
 dados_sinasc_2$IDANOMAL = factor(dados_sinasc_2$IDANOMAL, 
-                                  levels = c(1,2),
-                                  labels = c("Sim", "Nao"))
+                                 levels = c(1,2),
+                                 labels = c("Sim", "Nao"))
 dados_sinasc_2$ESCMAE2010 = factor(dados_sinasc_2$ESCMAE2010, 
-                                  levels = c(0,1,2,3,4,5),
-                                  labels = c("Sem escolaridade", "Fundamental I", "Fundamental II", "Medio", "Superior incompleto", "Superior completo"))
+                                   levels = c(0,1,2,3,4,5),
+                                   labels = c("Sem escolaridade", "Fundamental I", "Fundamental II", "Medio", "Superior incompleto", "Superior completo"))
 dados_sinasc_2$RACACORMAE = factor(dados_sinasc_2$RACACORMAE, 
                                    levels = c(1,2,3,4,5),
                                    labels = c("Branca", "Preta", "Amarela", "Parda", "Indigena"))
@@ -112,8 +112,8 @@ dados_sinasc_2$TPAPRESENT = factor(dados_sinasc_2$TPAPRESENT,
                                    levels = c(1,2,3),
                                    labels = c("Cefalico", "Pelvica ou podalica", "Transversa"))
 dados_sinasc_2$PARIDADE = factor(dados_sinasc_2$PARIDADE, 
-                                   levels = c(0,1),
-                                   labels = c("Multipara", "Nulipara"))
+                                 levels = c(0,1),
+                                 labels = c("Multipara", "Nulipara"))
 dados_sinasc_2$KOTELCHUCK = factor(dados_sinasc_2$KOTELCHUCK, 
                                    levels = c(1,2,3,4,5),
                                    labels = c("Não realizou pré-natal", "Inadequado", "Intermediário", "Adequado", "Mais que adequado"))
@@ -149,7 +149,7 @@ dados_sinasc_2$F_PIG = factor(dados_sinasc_2$F_PIG, levels = c("PIG","AIG","GIG"
 
 
 #Tarefas 9 e 10 (reformulada) do script esqueleto:
-  
+
 #  Crie um banco de dados, de nome SINASC_UF.csv (Exemplo: SINASC_RJ.csv), contendo as 103 variáveis listadas no arquivo “Variáveis - Projeto - Tarefas 9 e 10 da Etapa 1.pdf”
 
 #O banco final deverá possuir:
@@ -275,7 +275,7 @@ pre_termo$GESTACAO = ifelse(pre_termo$GESTACAO == "Menos de 22 semanas" |
                               pre_termo$GESTACAO == "22 a 27 semanas" |
                               pre_termo$GESTACAO == "28 a 31 semanas" |
                               pre_termo$GESTACAO == "32 a 36 semanas", 
-                               "TGD_PRT", ifelse(pre_termo$GESTACAO == "37 a 41 semanas", "TGD_AT", "TGD_PST"))
+                            "TGD_PRT", ifelse(pre_termo$GESTACAO == "37 a 41 semanas", "TGD_AT", "TGD_PST"))
 pre_termo = pre_termo |> group_by(CODMUNRES, GESTACAO) |> count() |>
   pivot_wider(names_from = GESTACAO, values_from =  n) |> as.data.frame()
 pre_termo[is.na(pre_termo)] = 0
@@ -283,7 +283,7 @@ pre_termo = pre_termo[,-ncol(pre_termo)]
 base = merge(base, pre_termo, by = "CODMUNRES", all.x = TRUE)
 #percentils duracao
 p_gestacao = aggregate( SEMAGESTAC ~ CODMUNRES, dados_sinasc_2, function(x) quantile(x, probs =
-                                                                                  c(0.25,0.5,0.75), na.rm = TRUE))
+                                                                                       c(0.25,0.5,0.75), na.rm = TRUE))
 p_gestacao = do.call(data.frame, p_gestacao)
 names(p_gestacao) = c("CODMUNRES","DG_P25","DG_P50", "DG_P75")
 p_gestacao[, c("DG_P25","DG_P50","DG_P75")] = round(p_gestacao[, c("DG_P25","DG_P50","DG_P75")], 2)
@@ -310,7 +310,7 @@ base = merge(base, pre_natal, by = "CODMUNRES", all.x = TRUE)
 #peregrinacao
 peregrinacao = dados_sinasc_2
 peregrinacao$PEREGRINACAO = ifelse(peregrinacao$CODMUNRES != peregrinacao$CODMUNNASC, 
-                               "TGPRG_S", "TGPRG_N")
+                                   "TGPRG_S", "TGPRG_N")
 peregrinacao = peregrinacao |> group_by(CODMUNRES, PEREGRINACAO) |> count() |>
   pivot_wider(names_from = PEREGRINACAO, values_from =  n) |> as.data.frame()
 peregrinacao[is.na(peregrinacao)] = 0
@@ -375,7 +375,7 @@ base = merge(base, peso, by = "CODMUNRES", all.x = TRUE)
 
 #percentil peso
 p_peso = aggregate( PESO ~ CODMUNRES, dados_sinasc_2, function(x) quantile(x, probs =
-                                                                                       c(0.25,0.5,0.75), na.rm = TRUE))
+                                                                             c(0.25,0.5,0.75), na.rm = TRUE))
 p_peso = do.call(data.frame, p_peso)
 names(p_peso) = c("CODMUNRES","PESO_P25","PESO_P50", "PESO_P75")
 p_peso[, c("PESO_P25","PESO_P50","PESO_P75")] = round(p_peso[, c("PESO_P25","PESO_P50","PESO_P75")], 2)
@@ -518,27 +518,27 @@ dados_sim_2 = dados_sim_2 |> mutate(SEXO = na_if(SEXO, 0)) |>
 #          2. Nesta Tarefa 6 não crie novas variáveis no banco de dados
 
 dados_sim_2$TIPOBITO = factor(dados_sim_2$TIPOBITO, 
-                                levels = c(1,2),
-                                labels = c("Fetal", "Não Fetal"))
-dados_sim_2$SEXO = factor(dados_sim_2$SEXO, 
                               levels = c(1,2),
-                              labels = c("Masculino", "Feminino"))
+                              labels = c("Fetal", "Não Fetal"))
+dados_sim_2$SEXO = factor(dados_sim_2$SEXO, 
+                          levels = c(1,2),
+                          labels = c("Masculino", "Feminino"))
 dados_sim_2$RACACOR = factor(dados_sim_2$RACACOR, 
-                          levels = c(1,2,3,4,5),
-                          labels = c("Branca", "Preta", "Amarela", "Parda", "Indigena"))
+                             levels = c(1,2,3,4,5),
+                             labels = c("Branca", "Preta", "Amarela", "Parda", "Indigena"))
 dados_sim_2$TPMORTEOCO = factor(dados_sim_2$TPMORTEOCO, 
-                             levels = c(1,2,3,4,5,8),
-                             labels = c("Na gravidez", "No parto", "No abortamento", 
-                                        "Até 42 dias após o término do parto", 
-                                        "de 43 dias a 1 ano após o termino da gestação",
-                                        "Não ocorreu nestes períodos"))
+                                levels = c(1,2,3,4,5,8),
+                                labels = c("Na gravidez", "No parto", "No abortamento", 
+                                           "Até 42 dias após o término do parto", 
+                                           "de 43 dias a 1 ano após o termino da gestação",
+                                           "Não ocorreu nestes períodos"))
 dados_sim_2$OBITOGRAV = factor(dados_sim_2$OBITOGRAV, 
-                                levels = c(1,2),
-                                labels = c("Sim", "Não"))
+                               levels = c(1,2),
+                               labels = c("Sim", "Não"))
 dados_sim_2$OBITOPUERP = factor(dados_sim_2$OBITOPUERP, 
-                               levels = c(1,2,3),
-                               labels = c("Sim, até 42 dias após o parto",
-                                          "Sim, de 43 dias a 1 ano" ,"Não"))
+                                levels = c(1,2,3),
+                                labels = c("Sim, até 42 dias após o parto",
+                                           "Sim, de 43 dias a 1 ano" ,"Não"))
 dados_sim_2$TPOBITOCOR = factor(dados_sim_2$TPOBITOCOR, 
                                 levels = c(1,2,3,4,5,6,7,8),
                                 labels = c("Durante a gestação", "Durante o abortamento",
@@ -586,8 +586,8 @@ base = merge(base, causas, by = "CODMUNRES", all.x = TRUE)
 causas = dados_sim_2
 causas$CAUSABAS = ifelse(startsWith(causas$CAUSABAS, c("A","B")),"TO_CB_I",
                          ifelse(startsWith(causas$CAUSABAS, c("C","D")),"TO_CB_N",
-                         ifelse(startsWith(causas$CAUSABAS, "I"), "TO_CB_C",
-                         ifelse(startsWith(causas$CAUSABAS, "J"), "TO_CB_R", "TO_CB_O"))))
+                                ifelse(startsWith(causas$CAUSABAS, "I"), "TO_CB_C",
+                                       ifelse(startsWith(causas$CAUSABAS, "J"), "TO_CB_R", "TO_CB_O"))))
 causas = causas |> group_by(CODMUNRES, CAUSABAS) |> count() |> 
   pivot_wider(names_from = CAUSABAS, values_from = n) |> as.data.frame()
 causas[is.na(causas)] = 0
@@ -608,8 +608,8 @@ base = merge(base, idade_fertil, by = "CODMUNRES", all.x = TRUE)
 
 #obitos_fetais
 obitos = dados_sim_2 |> filter(TPOBITOCOR == "Durante a gestação" | TPOBITOCOR == "Durante o abortamento " |
-                               TPOBITOCOR == "Após o abortamento" | 
-                               TPOBITOCOR == "No parto ou até 1 hora após o parto") |> group_by(CODMUNRES) |>
+                                 TPOBITOCOR == "Após o abortamento" | 
+                                 TPOBITOCOR == "No parto ou até 1 hora após o parto") |> group_by(CODMUNRES) |>
   count()
 names(obitos) = c("CODMUNRES", "TO_FT")
 obitos[is.na(obitos)] = 0
@@ -653,7 +653,7 @@ base = merge(base, total, by = "CODMUNRES", all.x = TRUE)
 
 morteParto = dados_sim_2 |> filter(!is.na(TPMORTEOCO)) |> 
   group_by(CODMUNRES, TPMORTEOCO) |> count()|> pivot_wider(names_from = TPMORTEOCO, 
-                                                 values_from = n)
+                                                           values_from = n)
 morteParto[is.na(morteParto)] = 0
 names(morteParto) = c("CODMUNRES","TO_MT_DG","TO_MT_43","TO_MT_PT","TO_MT_42","TO_MT_AB")
 base = merge(base, morteParto, by = "CODMUNRES", all.x = TRUE)
@@ -748,12 +748,8 @@ write.csv2(base, "SIM_UF.csv")
 # 6 IDHM_CA_M
 # 7 IDHM_CA_F
 
-# Exporte o arquivo em formato CSV# Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
-
-
 # Exporte o arquivo em formato CSV
 # Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
-
 
 
 
@@ -775,4 +771,3 @@ write.csv2(base, "SIM_UF.csv")
 
 # 1. Enviar arquivos para as pastas do repositório da Professora no GitHUb
 # 2. A professora fará o empilhamentos dos dataframes
-
