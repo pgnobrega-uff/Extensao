@@ -786,10 +786,30 @@ write.csv2(base, "Sinisa.csv")
 # 6 IDHM_CA_M
 # 7 IDHM_CA_F
 
+idhm_2010 = read.csv2("IDHM - 2010 - municípios - Atlas Brasil.csv")
+idhm_2010 = idhm_2010[,c(1,2)]
+idhm_2010 = idhm_2010|> filter(str_detect(município, "RS"))
+idhm_2010$município = idhm_2010$município |> substr(1, nchar(idhm_2010$município) - 5)
+codigos = read.csv2("códigos dos municípios - 2010.csv")
+codigos = codigos[,c(1,2)]
+codigos$CODMUNRES = as.character(codigos$CODMUNRES)
+codigos = codigos|> filter(startsWith(codigos$CODMUNRES, "43"))
+idhm_2010 = merge(idhm_2010, codigos, by = "município")
+
+base = data.frame(CODMUNRES =sort(unique(idhm_2010$CODMUNRES)))
+base$ANO = 2015
+base$NIVEL = "MUNICIPIO"
+base = base[,c(2,3,1)]
+base["IDHM_A"] = 0
+base["IDHM_CA"] = idhm_2010$IDHM_2010
+base["IDHM_CA_M"] = 0
+base["IDHM_CA_F"] = 0
+last_row = data.frame(ANO = 2015, NIVEL = "UF", CODMUNRES = "43", IDHM_A = 787, 
+                      IDHM_CA = 746, IDHM_CA_M = 716, IDHM_CA_F = 772)
+base = rbind(base, last_row)
 # Exporte o arquivo em formato CSV
 # Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
-
-
+write.csv2(base, "ATLAS.csv")
 
 #####################################################################################################
 # ETAPA 4: GERAR BANCO DE DADOS FINAL DO ESTADO, BASEADO NAS ANÁLISES DE SINASC, SIM, IBGE, SNIS,...
