@@ -6,6 +6,7 @@
 # Para realizar as tarefas da ETAPA 1, ABRIR ANTES uma branch de nome SINASC no main de Extensao e ir para ela
 # Após os alunos concluírem a ETAPA 1 a professora orientará fazer o merge into main e depois abrir outro branch. Aguarde...
 library(tidyverse)
+library(readxl) 
 
 ####################################
 # ETAPA 1: BANCO DE DADOS DO SINASC
@@ -701,7 +702,10 @@ write.csv2(base, "SIM_UF.csv")
 # 2. população residente censo 2010 - UF e municípios - total e por sexo - SIDRA - tabela_1552.csv  
 # 3. população residente censo 2010 - por faixa etária -  UF - SIDRA - tabela_1552.csv
 # 4. população residente censo 2010 - por faixa etária e sexo -  municípios - SIDRA - tabela_1552.csv
-
+RS_2015_res_Estimada = read_excel("2015_RS_MUN_Residente_Estimada.xlsx")
+RS_2010_MUN_Por_Sexo = read_excel("2010_RS_MUN_Por_Sexo.xlsx")
+RS_2010_MUN_Por_Faixa = read_excel("2010_RS_MUN_Por_Faixa.xlsx")
+RS_2010_MUN_Faixa_Sexo = read_excel("2010_RS_MUN_Por_Faixa_Sexo.xlsx")
 # A partir dos arquivos acima gere o banco de dados de nome SIDRA_UF com as seguintes variáveis:
 # 1  ANO    
 # 2  NIVEL
@@ -716,10 +720,31 @@ write.csv2(base, "SIM_UF.csv")
 # 11 POPRC_F_15
 # 12 POPRC_F_15_49
 # 13 POPRC_F_50
+base = data.frame(CODMUNRES =sort(unique(RS_2010_MUN_Por_Sexo$Cod)))
+base$ANO = 2015
+base$NIVEL = "MUNICIPIO"
+base = base[,c(2,3,1)]
+base[1,2] = "UF"
 
+setdiff(RS_2015_res_Estimada$Cod, RS_2010_MUN_Faixa_Sexo$Cod)
+# o municipio Pinto Bandeira (RS) foi formado depois de 2010
+#vai ser excluido
+
+
+base["POPRE_T"] = RS_2015_res_Estimada$`Pop Estimada`
+base["POPRC_T"] = RS_2010_MUN_Por_Sexo$Total
+base["POPRC_M"] = RS_2010_MUN_Por_Sexo$Homem
+base["POPRC_F"] = RS_2010_MUN_Por_Sexo$Mulher
+RS_2010_MUN_Por_Faixa[is.na(RS_2010_MUN_Por_Faixa)] = 0
+base["POPRC_15"] = rowSums(RS_2010_MUN_Por_Faixa[,c(3,4,5)])
+base["POPRC_15_49"] = rowSums(RS_2010_MUN_Por_Faixa[,c(6:12)])
+base["POPRC_50"] = rowSums(RS_2010_MUN_Por_Faixa[,c(13:21)])
+base["POPRC_F_15"] = rowSums(RS_2010_MUN_Faixa_Sexo[,c(22,23,24)])
+base["POPRC_F_15_49"] = rowSums(RS_2010_MUN_Faixa_Sexo[,c(25:31)])
+base["POPRC_F_50"] = rowSums(RS_2010_MUN_Faixa_Sexo[,c(32:40)])
 # Exporte o arquivo em formato CSV
 # Faça o commit com a mensagem "Script e dados TAREFA 3 - SIDRA"
-
+write.csv2(base, "SIDRA.csv")
 # Tarefa 2: Acesso aos bancos de dados do SINISA e obtenção da informação
 # Escreva os comandos da Tarefa 2 estando na branch OUTROS# Leia o arquivo agua e esgoto - município - 2015.csv 
 # A partir do arquivo acima gere o banco de dados de nome SINISA_UF com as seguintes variáveis:
