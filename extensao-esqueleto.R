@@ -838,11 +838,16 @@ base = merge(base, sim, by = "CODMUNRES")
 base = merge(base, sinisa, by = "CODMUNRES")
 write.csv2(base, "DA_RS.csv")
 # Tarefa 2: Acrescentar no banco DA_UF os indicadores TFG, TMG, RMM, TMM, TMM_P, TMN, TMN_P, TMN_T e TMI e chamar o banco de BDEM_UF_2015
-
+base$TFG = (base$TN / base$POPRC_F_15_49)*1000
+base$TMG = (base$TO/base$POPRE_T) * 1000
+base$RMM = (base$TO_MT / base$TN) * 1000
+base$TMM = (base$TO_MT/base$POPRC_F_15_49) * 100000
+base$TMM_P = (base$TO_MT_P / base$POPRC_15_49) * 100000
+base$TMI = ((base$TO_MT + base$TO_MT_PT) / base$TN) * 1000
 # Após a criação do banco, fazer commit “Script e dados BDEM_UF_2015”
 
 # Exporte o arquivo em formato CSV# Faça o commit com a mensagem "Script e dados TAREFA 3 - ATLAS"
-
+write.csv2(base, "BDEM_RS_2015.csv")
 
 
 
